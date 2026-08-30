@@ -9,7 +9,7 @@ import axios from "axios";
 import { USER_API_END_POINT } from "@/utils/constant";
 import {toast} from "sonner"
 import { useDispatch, useSelector } from "react-redux";
-import { setLoading } from "@/redux/authSlice";
+import { setLoading, setUser } from "@/redux/authSlice";
 import { Loader, Loader2 } from "lucide-react";
 
 export const Login = () => {
@@ -36,19 +36,22 @@ export const Login = () => {
           try {
             dispatch(setLoading(true));
             const res = await axios.post(`${USER_API_END_POINT}/login`, input, {
-              header: {
+              headers: {
               "Content-Type": "application/json"
             },
             withCredentials:true,
             });
-          
+
+
+          console.log("LOGIN RESPONSE:", res.data);
             if(res.data.success){
+              dispatch(setUser(res.data.user));
               navigate("/");
               toast.success(res.data.message);
             }
           } catch (error) {
             console.log(error);
-            toast.error(error.response.data.message);
+            toast.error(error.response?.data?.message || "Login failed");
           } finally {
             dispatch(setLoading(false));
           }
@@ -119,7 +122,7 @@ export const Login = () => {
 
           }
          
-          <span className = "text-small"> Don't have an account? <Link to  = "/signup" className = "text-blue-600">Signup</Link> </span>
+          
           Link
         </form>
       </div>
